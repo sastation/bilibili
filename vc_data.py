@@ -3,13 +3,18 @@
 '''收集 bilibili 上 vocaloid 相关的数据'''
 
 import re
+import time
 import bs4
 import requests
 
-def vocaloid(url):
-    '''收集指定页面的条目及相关信息'''
 
-    r = requests.get(url)
+def vocaloid(rs, url):
+    '''收集指定页面的条目及相关信息'''
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'
+    }
+    r = rs.get(url, headers=headers)
+    r = rs.get(url, headers=headers)
     if r.status_code != 200:
         return -1
 
@@ -21,9 +26,9 @@ def vocaloid(url):
     avs = []
     for title in soup.find_all(class_="title"):
         try:
-            #titles.append(title.string.strip())
+            # titles.append(title.string.strip())
             titles.append(title.contents[0].strip())
-        except AttributeError as e:
+        except AttributeError:
             titles.append("-")
 
         m = re.match(".*/(av\d+).*", title.attrs["href"])
@@ -50,15 +55,22 @@ def vocaloid(url):
             (avs[i], dates[i], watchs[i], bullets[i], titles[i])
         print str_out.encode("utf-8")
 
-# Mainw
-for i in range(1, 51):
-    bb_url = ("http://search.bilibili.com/all?keyword="
-              + "VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&page="
-              + str(i) + "&order=click")
-    #print bb_url
-    #try:
-    vocaloid(bb_url)
-    #except Exception as e:
-    #   print "-,-,-,-,-"
 
+def main():
+    '''main function'''
+    rs = requests.Session()
+    url = ("http://search.bilibili.com/all?keyword="
+           "VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click"
+           "&page=")
+    for i in range(1, 51):
+        # print "# %s" % (url + str(i))
+        vocaloid(rs, url+str(i))
+        if i % 10 == 0:
+            time.sleep(5)
+    return 0
+
+
+# Main
+if __name__ == '__main__':
+    main()
 # End
