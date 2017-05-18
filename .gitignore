@@ -1,6 +1,5 @@
 data
 video
 test*
-*.db
 *.log
 *.pyc
