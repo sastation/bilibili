@@ -11,4 +11,4 @@ dtm=$(date +"%y%m%d")
 
 # collect data into sqlite db
 cd /home/zwang/coding/github/bilibili/
-./vc_db.py > vc_db.log 2>&1
+./vc_db.py -u > vc_db.log 2>&1

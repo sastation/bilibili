@@ -1,5 +1,6 @@
-*.db
-test*
-vc.list*
-*list
 data
+video
+test*
+*.db
+*.log
+*.pyc

@@ -9,7 +9,8 @@ import argparse
 
 from vcdb import vc_db_init as dbinit
 from vcdb import vc_db_update as dbupdate
-db_file = 'vc_test.db'
+from vcdb import vc_db_download as dbdownload
+db_file = 'vc_data.db'
 
 
 def init_db(db_file):
@@ -44,7 +45,7 @@ if __name__ == '__main__':
         update_db(db_file)
     elif args.download:
         print 'download video'
-        # download(db_file)
+        dbdownload.download(db_file)
     else:
         parser.print_help()
 # End
