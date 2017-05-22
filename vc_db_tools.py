@@ -5,6 +5,7 @@
 '''
 import sqlite3
 import argparse
+import time
 
 db_file = 'vc_data.db'
 
@@ -14,6 +15,8 @@ class queryDB(object):
 
     def __init__(self, db_file):
         self.conn = sqlite3.connect(db_file)
+        self.one_week_ago = time.strftime('%Y-%m-%d',
+                                          time.localtime(time.time() - 24 * 3600 * 7))
 
     def __del__(self):
         self.conn.close()
@@ -73,7 +76,8 @@ class queryDB(object):
         else:
             sql = ('select avnum, uploadtime, updatetime, palacetime,'
                    ' downtime, downstatus, playnum, dmnum, title'
-                   ' from bbvc where palacetime like "%s";' % day)
+                   ' from bbvc where palacetime like "%s"'
+                   ' order by palacetime;' % day)
             self._query(sql)
 
     def download(self, day=None):
@@ -83,7 +87,8 @@ class queryDB(object):
         else:
             sql = ('select avnum, uploadtime, updatetime, palacetime,'
                    ' downtime, downstatus, playnum, dmnum, title'
-                   ' from bbvc where downtime like "%s";' % day)
+                   ' from bbvc where downtime like "%s"'
+                   ' order by downtime;' % day)
             self._query(sql)
 
     def update(self, day=None):
@@ -100,11 +105,38 @@ class queryDB(object):
         sql = 'select count(*) from bbvc;'
         self._query(sql, 'Total')
         print '-' * 79
-        self.update()
+
+        sql = 'select count(*) from bbvc where updatetime isnull;'
+        self._query(sql, 'none-updatime-count')
+        sql = ('select count(*) from bbvc where updatetime notnull'
+               ' and updatetime < "%s"' % self.one_week_ago)
+        self._query(sql, 'update-before-one-week')
+        sql = ('select updatetime, count(*) from bbvc'
+               ' where updatetime notnull and updatetime >= "%s"'
+               ' group by updatetime' % self.one_week_ago)
+        self._query(sql, 'update-time, count')
         print '-' * 79
-        self.palace()
+
+        sql = 'select count(*) from bbvc where palacetime isnull;'
+        self._query(sql, 'none-palace-count')
+        sql = ('select count(*) from bbvc where palacetime notnull'
+               ' and palacetime < "%s"' % self.one_week_ago)
+        self._query(sql, 'palace-before-one-week')
+        sql = ('select palacetime, count(*) from bbvc'
+               ' where palacetime notnull and palacetime >= "%s"'
+               ' group by palacetime' % self.one_week_ago)
+        self._query(sql, 'palace-time, count')
         print '-' * 79
-        self.download()
+
+        sql = 'select count(*) from bbvc where downtime isnull;'
+        self._query(sql, 'none-download-count')
+        sql = ('select count(*) from bbvc where downtime notnull'
+               ' and downtime < "%s"' % self.one_week_ago)
+        self._query(sql, 'download-before-one-week')
+        sql = ('select downtime, count(*) from bbvc'
+               ' where downtime notnull and downtime >= "%s"'
+               ' group by downtime' % self.one_week_ago)
+        self._query(sql, 'download-time, count')
         print '-' * 79
 
     def watch(self, limit=None):
@@ -131,11 +163,21 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--all', action='store_true',
                         help='show all vc records')
     parser.add_argument('-s', '--stat', action='store_true',
-                        help='show overall report')
+                        help='show overview report')
     parser.add_argument('-n', '--name', action='store',
                         help='search title name')
     parser.add_argument('-w', '--watch', action='store', type=int,
                         help='sort by play number')
+    parser.add_argument('-dm', '--danmu', action='store', type=int,
+                        help='sort by danmu number')
+    parser.add_argument('-p', '--palace', action='store',
+                        help='search by palace time')
+    parser.add_argument('-d', '--download', action='store',
+                        help='search by download time')
+    parser.add_argument('-ul', '--upload', action='store',
+                        help='search by upload time')
+    parser.add_argument('-ud', '--update', action='store',
+                        help='search by update time')
     args = parser.parse_args()
 
     db = queryDB(db_file)
@@ -144,9 +186,31 @@ if __name__ == '__main__':
     elif args.stat:
         db.statistics()
     elif args.name:
-        db.name('%'+args.name+'%')
+        db.name('%' + args.name + '%')
     elif args.watch:
         db.watch(args.watch)
+    elif args.danmu:
+        db.dm(args.danmu)
+    elif args.download:
+        if args.download == 'all':
+            db.download()
+        else:
+            db.download('%' + args.download + '%')
+    elif args.palace:
+        if args.palace == 'all':
+            db.palace()
+        else:
+            db.palace('%' + args.palace + '%')
+    elif args.upload:
+        if args.upload == 'all':
+            db.upload()
+        else:
+            db.upload('%' + args.upload + '%')
+    elif args.update:
+        if args.update == 'all':
+            db.update()
+        else:
+            db.update('%' + args.update + '%')
     else:
         print parser.print_help()
 
