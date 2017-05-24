@@ -101,42 +101,40 @@ class queryDB(object):
                    ' from bbvc where updatetime like "%s";' % day)
             self._query(sql)
 
-    def statistics(self):
+    def statistics(self, lastnum=7):
+        '''overview report and last <lastnum> records'''
         sql = 'select count(*) from bbvc;'
         self._query(sql, 'Total')
         print '-' * 79
 
         sql = 'select count(*) from bbvc where updatetime isnull;'
         self._query(sql, 'none-updatime-count')
-        sql = ('select count(*) from bbvc where updatetime notnull'
-               ' and updatetime < "%s"' % self.one_week_ago)
-        self._query(sql, 'update-before-one-week')
+        sql = ('select count(*) from bbvc where updatetime notnull;')
+        self._query(sql, 'update-count')
         sql = ('select updatetime, count(*) from bbvc'
-               ' where updatetime notnull and updatetime >= "%s"'
-               ' group by updatetime' % self.one_week_ago)
-        self._query(sql, 'update-time, count')
+               ' where updatetime notnull group by updatetime'
+               ' order by updatetime desc limit %i;' % lastnum)
+        self._query(sql, 'update-time, count # last %i records' % lastnum)
         print '-' * 79
 
         sql = 'select count(*) from bbvc where palacetime isnull;'
         self._query(sql, 'none-palace-count')
-        sql = ('select count(*) from bbvc where palacetime notnull'
-               ' and palacetime < "%s"' % self.one_week_ago)
-        self._query(sql, 'palace-before-one-week')
+        sql = ('select count(*) from bbvc where palacetime notnull;')
+        self._query(sql, 'palace-count')
         sql = ('select palacetime, count(*) from bbvc'
-               ' where palacetime notnull and palacetime >= "%s"'
-               ' group by palacetime' % self.one_week_ago)
-        self._query(sql, 'palace-time, count')
+               ' where palacetime notnull group by palacetime'
+               ' order by palacetime desc limit %i;' % lastnum)
+        self._query(sql, 'palace-time, count # last %i records' % lastnum)
         print '-' * 79
 
         sql = 'select count(*) from bbvc where downtime isnull;'
         self._query(sql, 'none-download-count')
-        sql = ('select count(*) from bbvc where downtime notnull'
-               ' and downtime < "%s"' % self.one_week_ago)
-        self._query(sql, 'download-before-one-week')
+        sql = ('select count(*) from bbvc where downtime notnull;')
+        self._query(sql, 'download-count')
         sql = ('select downtime, count(*) from bbvc'
-               ' where downtime notnull and downtime >= "%s"'
-               ' group by downtime' % self.one_week_ago)
-        self._query(sql, 'download-time, count')
+               ' where downtime notnull group by downtime'
+               ' order by downtime desc limit %i;' % lastnum)
+        self._query(sql, 'download-time, count # last %i records' % lastnum)
         print '-' * 79
 
     def watch(self, limit=None):
@@ -162,8 +160,8 @@ if __name__ == '__main__':
 
     parser.add_argument('-a', '--all', action='store_true',
                         help='show all vc records')
-    parser.add_argument('-s', '--stat', action='store_true',
-                        help='show overview report')
+    parser.add_argument('-s', '--stat', nargs='?', const=5, type=int,
+                        help='show overview report and last [5] records')
     parser.add_argument('-n', '--name', action='store',
                         help='search title name')
     parser.add_argument('-w', '--watch', action='store', type=int,
@@ -183,8 +181,8 @@ if __name__ == '__main__':
     db = queryDB(db_file)
     if args.all:
         db.all()
-    elif args.stat:
-        db.statistics()
+    elif args.stat >= 0:
+        db.statistics(args.stat)
     elif args.name:
         db.name('%' + args.name + '%')
     elif args.watch:
