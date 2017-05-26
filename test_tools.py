@@ -2,7 +2,7 @@
 # coding:utf-8
 '''unit test for vc_db_tools.py'''
 
-import test as tools
+import vc_db_tools as tools
 
 db = tools.queryDB('vc_data.db')
 
