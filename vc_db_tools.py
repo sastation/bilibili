@@ -21,7 +21,7 @@ class queryDB(object):
     def __del__(self):
         self.conn.close()
 
-    def _query(self, sql, title=None):
+    def _output(self, lines, title=None):
         if title is None:
             print ('avnum, upload-time, update-time, palace-time,'
                    ' download-time, download-status, watch-times,'
@@ -29,9 +29,7 @@ class queryDB(object):
         else:
             print title
 
-        curs = self.conn.execute(sql)
-        rows = curs.fetchall()
-        for row in rows:
+        for row in lines:
             for item in row:
                 if type(item) == unicode:
                     print item.encode('utf-8'),
@@ -39,67 +37,77 @@ class queryDB(object):
                     print '-',
                 else:
                     print item,
-            print ""
+            print ''
+
+    def _query(self, sql, title=None):
+        curs = self.conn.execute(sql)
+        rows = curs.fetchall()
+        self._output(rows, title)
+        return rows
 
     def all(self):
         sql = ('select avnum, uploadtime, updatetime, palacetime,'
                ' downtime, downstatus, playnum, dmnum, title'
                ' from bbvc;')
-        self._query(sql)
+        return self._query(sql)
 
     def avid(self, avnum='%'):
         sql = ('select avnum, uploadtime, updatetime, palacetime,'
                ' downtime, downstatus, playnum, dmnum, title'
                ' from bbvc where avnum like "%s";' % avnum)
-        self._query(sql)
+        return self._query(sql)
 
     def name(self, title='%'):
         sql = ('select avnum, uploadtime, updatetime, palacetime,'
                ' downtime, downstatus, playnum, dmnum, title'
                ' from bbvc where title like "%s";' % title)
-        self._query(sql)
+        return self._query(sql)
 
     def upload(self, day=None):
         if day is None:
-            sql = 'select uploadtime, count(*) from bbvc group by uploadtime;'
-            self._query(sql, 'uplaodtime, count')
+            sql = ('select uploadtime, count(*) from bbvc group by uploadtime'
+                   ' order by uploadtime desc;')
+            return self._query(sql, 'uplaodtime, count')
         else:
             sql = ('select avnum, uploadtime, updatetime, palacetime,'
                    ' downtime, downstatus, playnum, dmnum, title'
                    ' from bbvc where uploadtime like "%s";' % day)
-            self._query(sql)
+            return self._query(sql)
 
     def palace(self, day=None):
         if day is None:
-            sql = 'select palacetime, count(*) from bbvc group by palacetime;'
-            self._query(sql, 'palace-time, count')
+            sql = ('select palacetime, count(*) from bbvc group by palacetime'
+                   ' order by palacetime desc;')
+            return self._query(sql, 'palace-time, count')
         else:
             sql = ('select avnum, uploadtime, updatetime, palacetime,'
                    ' downtime, downstatus, playnum, dmnum, title'
                    ' from bbvc where palacetime like "%s"'
                    ' order by palacetime;' % day)
-            self._query(sql)
+            return self._query(sql)
 
     def download(self, day=None):
         if day is None:
-            sql = 'select downtime, count(*) from bbvc group by downtime;'
-            self._query(sql, 'download-time, count')
+            sql = ('select downtime, count(*) from bbvc group by downtime'
+                   ' order by downtime desc;')
+            return self._query(sql, 'download-time, count')
         else:
             sql = ('select avnum, uploadtime, updatetime, palacetime,'
                    ' downtime, downstatus, playnum, dmnum, title'
                    ' from bbvc where downtime like "%s"'
                    ' order by downtime;' % day)
-            self._query(sql)
+            return self._query(sql)
 
     def update(self, day=None):
         if day is None:
-            sql = 'select updatetime, count(*) from bbvc group by updatetime;'
-            self._query(sql, 'update-time, count')
+            sql = ('select updatetime, count(*) from bbvc group by updatetime'
+                   ' order by updatetime desc;')
+            return self._query(sql, 'update-time, count')
         else:
             sql = ('select avnum, uploadtime, updatetime, palacetime,'
                    ' downtime, downstatus, playnum, dmnum, title'
                    ' from bbvc where updatetime like "%s";' % day)
-            self._query(sql)
+            return self._query(sql)
 
     def statistics(self, lastnum=7):
         '''overview report and last <lastnum> records'''
@@ -137,13 +145,15 @@ class queryDB(object):
         self._query(sql, 'download-time, count # last %i records' % lastnum)
         print '-' * 79
 
+        return True
+
     def watch(self, limit=None):
         if limit is None:
             sql = 'select * from bbvc order by playnum desc;'
         else:
             sql = ('select * from bbvc where playnum >= %i'
                    ' order by playnum desc' % limit)
-        self._query(sql)
+        return self._query(sql)
 
     def dm(self, limit=None):
         if limit is None:
@@ -151,7 +161,7 @@ class queryDB(object):
         else:
             sql = ('select * from bbvc where dmnum >= %i'
                    ' order by dmnum desc' % limit)
-        self._query(sql)
+        return self._query(sql)
 
 
 # Main
