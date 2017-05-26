@@ -2,9 +2,20 @@
 # coding:utf-8
 '''unit test for vc_db_tools.py'''
 
-import vc_db_tools as tools
+import os
+import sys
 
-db = tools.queryDB('vc_data.db')
+lastdir = os.path.split(os.getcwd())[-1]
+
+if lastdir == 'unittest':
+    path = '..'
+else:
+    path = '.'
+
+
+sys.path.append(path)
+import vc_db_tools as tools
+db = tools.queryDB(path+'/vc_data.db')
 
 
 def test_query_all():
