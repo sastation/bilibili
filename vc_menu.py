@@ -15,7 +15,7 @@ def convert_menu(video_dir="./video"):
 
         # 转换字幕
         if not os.path.isfile('%s.ass' % file):
-            cmd = '~/src/danmaku2ass/danmaku2ass.py -o "%s.ass" -s 1920x1080 -fn "微软雅黑" -fs 52 -a 0.8 -dm 12 -ds 6 "%s"' % (
+            cmd = './video/danmaku2ass/danmaku2ass.py -o "%s.ass" -s 1920x1080 -fn "微软雅黑" -fs 52 -a 0.8 -dm 12 -ds 6 "%s"' % (
                 file, file)
             cmd = subprocess.call(cmd, shell=True)
             if cmd:
