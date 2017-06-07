@@ -22,7 +22,6 @@ def _get_data(url):
 
     rs = requests.Session()
     r = rs.get(url, headers=headers)
-    r = rs.get(url, headers=headers)
     if r.status_code != 200:
         return -1
 
