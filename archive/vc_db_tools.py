@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # coding: utf-8
 '''
 用于对vc数据库进行查询的一组工具
@@ -17,25 +17,27 @@ class queryDB(object):
         self.conn = sqlite3.connect(db_file)
         self.one_week_ago = time.strftime('%Y-%m-%d',
                                           time.localtime(time.time() - 24 * 3600 * 7))
-        self.columns = ('avnum, uploadtime, updatetime, palacetime, downstatus'
-                        ' playnum, dmnum, v_coin, v_reply, v_favorite, v_share, title')
 
     def __del__(self):
         self.conn.close()
 
     def _output(self, lines, title=None):
         if title is None:
-            print(self.columns)
+            print ('avnum, upload-time, update-time, palace-time,'
+                   ' download-time, download-status, watch-times,'
+                   ' dm-times, title')
         else:
-            print(title)
+            print title
 
         for row in lines:
             for item in row:
-                if item is None:
-                    print('-', end=" ")
+                if type(item) == unicode:
+                    print item.encode('utf-8'),
+                elif item is None:
+                    print '-',
                 else:
-                    print(item, end=" ")
-            print('')
+                    print item,
+            print ''
 
     def _query(self, sql, title=None):
         curs = self.conn.execute(sql)
@@ -44,17 +46,21 @@ class queryDB(object):
         return rows
 
     def all(self):
-        sql = ('select %s from bbvc;' % self.columns)
+        sql = ('select avnum, uploadtime, updatetime, palacetime,'
+               ' downtime, downstatus, playnum, dmnum, title'
+               ' from bbvc;')
         return self._query(sql)
 
     def avid(self, avnum='%'):
-        sql = ('select %s from bbvc where avnum like "%s";'
-               % (self.columns, avnum))
+        sql = ('select avnum, uploadtime, updatetime, palacetime,'
+               ' downtime, downstatus, playnum, dmnum, title'
+               ' from bbvc where avnum like "%s";' % avnum)
         return self._query(sql)
 
     def name(self, title='%'):
-        sql = ('select %s from bbvc where title like "%s";'
-               % (self.columns, title))
+        sql = ('select avnum, uploadtime, updatetime, palacetime,'
+               ' downtime, downstatus, playnum, dmnum, title'
+               ' from bbvc where title like "%s";' % title)
         return self._query(sql)
 
     def upload(self, day=None):
@@ -63,8 +69,9 @@ class queryDB(object):
                    ' order by uploadtime desc;')
             return self._query(sql, 'uplaodtime, count')
         else:
-            sql = ('select %s from bbvc where uploadtime like "%s";'
-                   % (self.columns, day))
+            sql = ('select avnum, uploadtime, updatetime, palacetime,'
+                   ' downtime, downstatus, playnum, dmnum, title'
+                   ' from bbvc where uploadtime like "%s";' % day)
             return self._query(sql)
 
     def palace(self, day=None):
@@ -73,8 +80,10 @@ class queryDB(object):
                    ' order by palacetime desc;')
             return self._query(sql, 'palace-time, count')
         else:
-            sql = ('select %s from bbvc where palacetime like "%s"'
-                   ' order by palacetime;' % (self.columns, day))
+            sql = ('select avnum, uploadtime, updatetime, palacetime,'
+                   ' downtime, downstatus, playnum, dmnum, title'
+                   ' from bbvc where palacetime like "%s"'
+                   ' order by palacetime;' % day)
             return self._query(sql)
 
     def download(self, day=None):
@@ -83,8 +92,10 @@ class queryDB(object):
                    ' order by downtime desc;')
             return self._query(sql, 'download-time, count')
         else:
-            sql = ('select %s from bbvc where downtime like "%s"'
-                   ' order by downtime;' % (self.columns, day))
+            sql = ('select avnum, uploadtime, updatetime, palacetime,'
+                   ' downtime, downstatus, playnum, dmnum, title'
+                   ' from bbvc where downtime like "%s"'
+                   ' order by downtime;' % day)
             return self._query(sql)
 
     def update(self, day=None):
@@ -93,15 +104,16 @@ class queryDB(object):
                    ' order by updatetime desc;')
             return self._query(sql, 'update-time, count')
         else:
-            sql = ('select %s from bbvc where updatetime like "%s";'
-                   % (self.columns, day))
+            sql = ('select avnum, uploadtime, updatetime, palacetime,'
+                   ' downtime, downstatus, playnum, dmnum, title'
+                   ' from bbvc where updatetime like "%s";' % day)
             return self._query(sql)
 
     def statistics(self, lastnum=7):
         '''overview report and last <lastnum> records'''
         sql = 'select count(*) from bbvc;'
         self._query(sql, 'Total')
-        print('-' * 79)
+        print '-' * 79
 
         sql = 'select count(*) from bbvc where updatetime isnull;'
         self._query(sql, 'none-updatime-count')
@@ -111,7 +123,7 @@ class queryDB(object):
                ' where updatetime notnull group by updatetime'
                ' order by updatetime desc limit %i;' % lastnum)
         self._query(sql, 'update-time, count # last %i records' % lastnum)
-        print('-' * 79)
+        print '-' * 79
 
         sql = 'select count(*) from bbvc where palacetime isnull;'
         self._query(sql, 'none-palace-count')
@@ -121,7 +133,7 @@ class queryDB(object):
                ' where palacetime notnull group by palacetime'
                ' order by palacetime desc limit %i;' % lastnum)
         self._query(sql, 'palace-time, count # last %i records' % lastnum)
-        print('-' * 79)
+        print '-' * 79
 
         sql = 'select count(*) from bbvc where downtime isnull;'
         self._query(sql, 'none-download-count')
@@ -131,7 +143,7 @@ class queryDB(object):
                ' where downtime notnull group by downtime'
                ' order by downtime desc limit %i;' % lastnum)
         self._query(sql, 'download-time, count # last %i records' % lastnum)
-        print('-' * 79)
+        print '-' * 79
 
         return True
 
@@ -139,16 +151,16 @@ class queryDB(object):
         if limit is None:
             sql = 'select * from bbvc order by playnum desc;'
         else:
-            sql = ('select %s from bbvc where playnum >= %i'
-                   ' order by playnum desc' % (self.columns, limit))
+            sql = ('select * from bbvc where playnum >= %i'
+                   ' order by playnum desc' % limit)
         return self._query(sql)
 
     def dm(self, limit=None):
         if limit is None:
             sql = 'select * from bbvc order by dmnum desc;'
         else:
-            sql = ('select %s from bbvc where dmnum >= %i'
-                   ' order by dmnum desc' % (self.columns, limit))
+            sql = ('select * from bbvc where dmnum >= %i'
+                   ' order by dmnum desc' % limit)
         return self._query(sql)
 
 
@@ -156,47 +168,59 @@ class queryDB(object):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-a', action='store_true',
+    parser.add_argument('-a', '--all', action='store_true',
                         help='show all vc records')
-    parser.add_argument('-s', nargs='?', const=5, type=int,
+    parser.add_argument('-s', '--stat', nargs='?', const=5, type=int,
                         help='show overview report and last [5] records')
-    parser.add_argument('-n', action='store',
+    parser.add_argument('-n', '--name', action='store',
                         help='search title name')
-    parser.add_argument('-w', action='store', type=int,
+    parser.add_argument('-w', '--watch', action='store', type=int,
                         help='sort by play number')
-    parser.add_argument('-dm', action='store', type=int,
+    parser.add_argument('-dm', '--danmu', action='store', type=int,
                         help='sort by danmu number')
-    parser.add_argument('-p', action='store', nargs='?', const='all',
+    parser.add_argument('-p', '--palace', action='store',
                         help='search by palace time')
-    parser.add_argument('-d', action='store', nargs='?', const='all',
+    parser.add_argument('-d', '--download', action='store',
                         help='search by download time')
-    parser.add_argument('-ul', action='store', nargs='?', const='all',
+    parser.add_argument('-ul', '--upload', action='store',
                         help='search by upload time')
-    parser.add_argument('-ud', action='store', nargs='?', const='all',
+    parser.add_argument('-ud', '--update', action='store',
                         help='search by update time')
     args = parser.parse_args()
 
     db = queryDB(db_file)
-    if args.a:
+    if args.all:
         db.all()
-    elif args.s is not None:
-        db.statistics(args.s)
-    elif args.n:
+    elif args.stat >= 0:
+        db.statistics(args.stat)
+    elif args.name:
         db.name('%' + args.name + '%')
-    elif args.w:
-        db.watch(args.w)
-    elif args.dm:
-        db.dm(args.dm)
-    elif args.d:
-        db.download() if args.d == 'all' else db.download('%' + args.d + '%')
-    elif args.p:
-        db.palace() if args.p == 'all' else db.palace('%' + args.p + '%')
-    elif args.ul:
-        db.upload() if args.ul == 'all' else db.upload('%' + args.ul + '%')
-    elif args.ud:
-        db.update() if args.ud == 'all' else db.update('%' + args.ud + '%')
+    elif args.watch:
+        db.watch(args.watch)
+    elif args.danmu:
+        db.dm(args.danmu)
+    elif args.download:
+        if args.download == 'all':
+            db.download()
+        else:
+            db.download('%' + args.download + '%')
+    elif args.palace:
+        if args.palace == 'all':
+            db.palace()
+        else:
+            db.palace('%' + args.palace + '%')
+    elif args.upload:
+        if args.upload == 'all':
+            db.upload()
+        else:
+            db.upload('%' + args.upload + '%')
+    elif args.update:
+        if args.update == 'all':
+            db.update()
+        else:
+            db.update('%' + args.update + '%')
     else:
-        print(parser.print_help())
+        print parser.print_help()
 
     # db.avid('av44%')
     # db.upload('2017%')
