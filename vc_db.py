@@ -12,11 +12,6 @@ from libs import vc_db_download as dbdownload
 db_file = 'vc_data.db'
 
 
-def update_db(db_file):
-    '''scan pages and update db'''
-    dbupdate.update_data(db_file, 1, 50)
-
-
 # Main function
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -28,10 +23,10 @@ if __name__ == '__main__':
 
     if args.update:
         print('update db data')
-        #update_db(db_file)
+        dbupdate.update_data(db_file, 1, 50)
     elif args.download:
         print('download video')
-        #dbdownload.download(db_file)
+        dbdownload.download(db_file)
     else:
         parser.print_help()
 # End

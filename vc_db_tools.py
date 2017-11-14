@@ -17,7 +17,7 @@ class queryDB(object):
         self.conn = sqlite3.connect(db_file)
         self.one_week_ago = time.strftime('%Y-%m-%d',
                                           time.localtime(time.time() - 24 * 3600 * 7))
-        self.columns = ('avnum, uploadtime, updatetime, palacetime, downstatus'
+        self.columns = ('avnum, uploadtime, updatetime, palacetime, downstatus,'
                         ' playnum, dmnum, v_coin, v_reply, v_favorite, v_share, title')
 
     def __del__(self):

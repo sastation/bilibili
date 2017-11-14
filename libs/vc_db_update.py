@@ -52,19 +52,28 @@ def _get_data(url):
     dms = []        # 弹幕数
     coins = []      # 硬币数
     shares = []     # 分享数
-    replys = []    # 评论数
+    replys = []     # 评论数
     favorites = []  # 收藏数
 
     aid_url = "http://api.bilibili.com/archive_stat/stat?aid=%s"
     for aid in aids:
-        html = rs.get(aid_url % aid, headers=headers).text
-        data = json.loads(html)
-        watchs.append(data['data']['view'])
-        dms.append(data['data']['danmaku'])
-        coins.append(data['data']['coin'])
-        shares.append(data['data']['share'])
-        replys.append(data['data']['reply'])
-        favorites.append(data['data']['favorite'])
+        # 若html为空，则取内容，最多三次
+        html = None
+        for i in range(0, 3):
+            html = rs.get(aid_url % aid, headers=headers).text
+            if html is not None:
+                break
+
+        try:
+            data = json.loads(html)
+            watchs.append(data['data']['view'])
+            dms.append(data['data']['danmaku'])
+            coins.append(data['data']['coin'])
+            shares.append(data['data']['share'])
+            replys.append(data['data']['reply'])
+            favorites.append(data['data']['favorite'])
+        except TypeError:
+            raise Exception("Error! %s, %s" % (aid_url % aid, html))
 
     # 汇总数据
     for i in range(0, len(titles)):
@@ -121,6 +130,7 @@ def update_data(db_file='vc_test.db', start_page=1, end_page=50):
            "VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click"
            "&page=")
     for i in range(start_page, end_page + 1):
+        print("Page:%s" % i)  # debug
         _get_data(url + str(i))
 
     _update_db(db_file)
@@ -131,6 +141,6 @@ def update_data(db_file='vc_test.db', start_page=1, end_page=50):
 # Main
 if __name__ == '__main__':
     '''main function'''
-    update_data(end_page=50)
+    update_data(end_page=2)
 
 # End
