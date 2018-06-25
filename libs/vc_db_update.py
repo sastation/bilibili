@@ -8,7 +8,7 @@
 
 import time
 import sqlite3
-import bs4
+# import bs4
 import requests
 import json
 
@@ -18,7 +18,7 @@ records = []
 def _get_data(url):
     '''收集指定页面的条目及相关信息'''
     headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0'
     }
 
     rs = requests.Session()
@@ -27,25 +27,24 @@ def _get_data(url):
         return -1
 
     html = r.text
-    soup = bs4.BeautifulSoup(html, "html.parser")
+    # soup = bs4.BeautifulSoup(html, "html.parser")
 
-    # aid 编号
+    data = json.loads(html)
+
+    # aid 编号 & 歌曲名称 & 上传时间
     aids = []
-    for line in soup.find_all(class_="search-watch-later icon-later-off"):
-        aids.append(line.attrs["data-aid"])
-
-    # 歌曲名称
     titles = []
-    for title in soup.find_all(class_="title"):
+    dates = []
+    for eachSong in data["result"]:
+        aids.append(eachSong["aid"])
+
+        uploadDate = time.strftime("%Y-%m-%d", time.localtime(eachSong["pubdate"]))
+        dates.append(uploadDate)
+
         try:
-            titles.append(title.contents[0].strip())
+            titles.append(eachSong["title"])
         except AttributeError:
             titles.append("-")
-
-    # 上传时间
-    dates = []
-    for date in soup.find_all(class_="so-icon time"):
-        dates.append(date.contents[2].strip())
 
     # 相关统计数据
     watchs = []     # 播放数
@@ -78,7 +77,7 @@ def _get_data(url):
     # 汇总数据
     for i in range(0, len(titles)):
         # titles[i] is unicode
-        records.append(['av'+aids[i], dates[i], watchs[i], dms[i], coins[i],
+        records.append([('av%s' % aids[i]), dates[i], watchs[i], dms[i], coins[i],
                         shares[i], replys[i], favorites[i], titles[i]])
 
     rs.close()
@@ -125,15 +124,26 @@ def _update_db(db_file):
 
 
 def update_data(db_file='vc_test.db', start_page=1, end_page=50):
+    # end_page = 5 # debug
+    
     '''下载VOCALOID中文曲按播放数排序的前50页页面'''
-    url = ("http://search.bilibili.com/all?keyword="
-           "VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click"
-           "&page=")
+    # url = ("http://search.bilibili.com/all?keyword="
+    #       "VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click"
+    #       "&page=")
+
+    url = ("http://search.bilibili.com/api/search?search_type=video"
+            "&keyword=VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click"
+            "&page=")
+
     for i in range(start_page, end_page + 1):
         print("Page:%s" % i)  # debug
         _get_data(url + str(i))
 
     _update_db(db_file)
+
+    # debug
+    # for line in records:
+    #     print(line)
 
     return 0
 
