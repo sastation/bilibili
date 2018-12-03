@@ -8,11 +8,58 @@
 
 import time
 import sqlite3
-# import bs4
 import requests
+
 import json
+import bs4
+import re
+
+# aid 编号 & 歌曲名称 & 上传时间
+aids    = []
+titles  = []
+dates   = []
 
 records = []
+
+Debug = False
+Detail = False
+import sys
+
+def _getMetaViaHtml(html):
+    '''通过html页面获得相关信息'''
+    soup = bs4.BeautifulSoup(html, "html.parser")
+
+    # 获得搜索页面结果内容，若没有返回 False
+    result = soup.findAll('div', class_='result-wrap clearfix')
+    if len(result)<1:
+        return(False)
+    
+    result = result[0]
+    songs = result.findAll('li', class_='video')
+    
+    size = len(songs)
+    print(size)
+
+    if Debug:
+        if size != 20:
+            print(html)
+            sys.exit(-1)
+
+    for eachSong in songs:
+        aid = eachSong.find('a', href=True)
+        aid = re.match('.*av(\d+)', aid['href'])
+        aid = aid.group(1)
+
+        title = eachSong.find('a', class_='title').text
+
+        date = eachSong.find('span', class_='so-icon time').text
+        date = date.strip(' ').strip('\n').strip(' ')
+
+        aids.append(aid)
+        titles.append(title)
+        dates.append(date)
+
+    return(True)
 
 
 def _get_data(url):
@@ -22,47 +69,43 @@ def _get_data(url):
     }
 
     rs = requests.Session()
-    r = rs.get(url, headers=headers)
-    if r.status_code != 200:
-        return -1
 
-    html = r.text
-    # soup = bs4.BeautifulSoup(html, "html.parser")
+    # 获得 aid:编号 & title:歌曲名称 & date:上传时间，若不能获得则重试最多5次
+    for i in range(5):
+        r = rs.get(url, headers=headers)
+        if r.status_code != 200:
+            return -1
 
-    data = json.loads(html)
-
-    # aid 编号 & 歌曲名称 & 上传时间
-    aids = []
-    titles = []
-    dates = []
-    for eachSong in data["result"]:
-        aids.append(eachSong["aid"])
-
-        uploadDate = time.strftime("%Y-%m-%d", time.localtime(eachSong["pubdate"]))
-        dates.append(uploadDate)
-
-        try:
-            titles.append(eachSong["title"])
-        except AttributeError:
-            titles.append("-")
-
+        html = r.text
+        
+        # 
+        if _getMetaViaHtml(html):
+            break
+        else:
+            print("Loop +1")
+            time.sleep(1)
+        
     # 相关统计数据
-    watchs = []     # 播放数
-    dms = []        # 弹幕数
-    coins = []      # 硬币数
-    shares = []     # 分享数
-    replys = []     # 评论数
-    favorites = []  # 收藏数
+    watchs      = []    # 播放数
+    dms         = []    # 弹幕数
+    coins       = []    # 硬币数
+    shares      = []    # 分享数
+    replys      = []    # 评论数
+    favorites   = []    # 收藏数
 
     aid_url = "http://api.bilibili.com/archive_stat/stat?aid=%s"
+
     for aid in aids:
         # 若html为空，则取内容，最多三次
         html = None
         for i in range(0, 3):
-            html = rs.get(aid_url % aid, headers=headers).text
+            try:
+                html = rs.get(aid_url % aid, headers=headers).text
+            except Exception as e:
+                html = None
+                
             if html is not None:
                 break
-
         try:
             data = json.loads(html)
             watchs.append(data['data']['view'])
@@ -124,26 +167,23 @@ def _update_db(db_file):
 
 
 def update_data(db_file='vc_test.db', start_page=1, end_page=50):
-    # end_page = 5 # debug
+    if Debug:
+        end_page = 5
     
     '''下载VOCALOID中文曲按播放数排序的前50页页面'''
-    # url = ("http://search.bilibili.com/all?keyword="
-    #       "VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click"
-    #       "&page=")
-
-    url = ("http://search.bilibili.com/api/search?search_type=video"
-            "&keyword=VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click"
-            "&page=")
-
+    # url = "http://search.bilibili.com/api/search?search_type=video&keyword=VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click&page="
+    url = "http://search.bilibili.com/all?keyword=VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click&page="
+    
     for i in range(start_page, end_page + 1):
-        print("Page:%s" % i)  # debug
+        print("Page:%s" % i, end=', ')  
+        # print(url+str(i)) # debug
         _get_data(url + str(i))
 
     _update_db(db_file)
 
-    # debug
-    # for line in records:
-    #     print(line)
+    if Debug and Detail:
+        for line in records:
+            print(line)
 
     return 0
 
