@@ -182,7 +182,7 @@ if __name__ == '__main__':
     elif args.s is not None:
         db.statistics(args.s)
     elif args.n:
-        db.name('%' + args.name + '%')
+        db.name('%' + args.n + '%')
     elif args.w:
         db.watch(args.w)
     elif args.dm:

@@ -24,8 +24,11 @@ def download(dbfile='vc_test.db'):
     for av in avs:
         url = "http://www.bilibili.com/video/" + av
         print('you-get -o video "%s" > /dev/null 2>&1' % url)
-        cmd = subprocess.call('you-get -o video "%s" > /dev/null 2>&1' % url,
-                              shell=True)
+
+        #!cmd = subprocess.call('you-get -o video "%s" > /dev/null 2>&1' % url,
+        #!                      shell=True)
+
+        cmd = subprocess.call('you-get -o video "%s" ' % url, shell=True)
         if cmd:
             status = 'wrong'
         else:
