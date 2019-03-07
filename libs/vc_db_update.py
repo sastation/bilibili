@@ -14,18 +14,14 @@ import json
 import bs4
 import re
 
-# aid 编号 & 歌曲名称 & 上传时间
-aids    = []
-titles  = []
-dates   = []
-
+# 所有记录
 records = []
 
 Debug = False
 Detail = False
 import sys
 
-def _getMetaViaHtml(html):
+def _getMetaViaHtml(html,aids,titles,dates):
     '''通过html页面获得相关信息'''
     soup = bs4.BeautifulSoup(html, "html.parser")
 
@@ -70,7 +66,14 @@ def _get_data(url):
 
     rs = requests.Session()
 
+
     # 获得 aid:编号 & title:歌曲名称 & date:上传时间，若不能获得则重试最多5次
+
+    ## aid 编号 & 歌曲名称 & 上传时间
+    aids    = []
+    titles  = []
+    dates   = []
+
     for i in range(5):
         r = rs.get(url, headers=headers)
         if r.status_code != 200:
@@ -79,7 +82,7 @@ def _get_data(url):
         html = r.text
         
         # 
-        if _getMetaViaHtml(html):
+        if _getMetaViaHtml(html,aids,titles,dates):
             break
         else:
             print("Loop +1")
@@ -107,6 +110,8 @@ def _get_data(url):
             if html is not None:
                 break
         try:
+            if Debug: print(html)
+
             data = json.loads(html)
             watchs.append(data['data']['view'])
             dms.append(data['data']['danmaku'])
@@ -116,6 +121,8 @@ def _get_data(url):
             favorites.append(data['data']['favorite'])
         except TypeError:
             raise Exception("Error! %s, %s" % (aid_url % aid, html))
+
+        #time.sleep(1) # 暂停1秒以避免被封
 
     # 汇总数据
     for i in range(0, len(titles)):
@@ -167,8 +174,7 @@ def _update_db(db_file):
 
 
 def update_data(db_file='vc_test.db', start_page=1, end_page=50):
-    if Debug:
-        end_page = 5
+    if Debug: end_page = 5
     
     '''下载VOCALOID中文曲按播放数排序的前50页页面'''
     # url = "http://search.bilibili.com/api/search?search_type=video&keyword=VOCALOID%E4%B8%AD%E6%96%87%E6%9B%B2&order=click&page="
@@ -177,7 +183,10 @@ def update_data(db_file='vc_test.db', start_page=1, end_page=50):
     for i in range(start_page, end_page + 1):
         print("Page:%s" % i, end=', ')  
         # print(url+str(i)) # debug
+        s_time = time.time()
         _get_data(url + str(i))
+        print("Time: %s" % (time.time()-s_time))
+        time.sleep(5) # 暂停5秒以避免被封
 
     _update_db(db_file)
 
