@@ -83,7 +83,8 @@ def download(avnum, title):
     import subprocess
     url = 'http://www.bilibili.com/video/' + avnum
     subprocess.call(
-        'you-get -o ./video/favorite/%s "%s" > /dev/null 2>&1' % (title, url), shell=True)
+        #'you-get -o ./video/favorite/%s "%s" > /dev/null 2>&1' % (title, url), shell=True)
+        'you-get -o ./video/favorite/%s "%s"' % (title, url), shell=True)
     return 0
 
 
@@ -92,8 +93,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', '--mid', action='store', default='25527367',
                         help='mid of bilibili space')
-    parser.add_argument('-t', '--title', action='store', default=u'VC之家', 
-                        help='title name, default is "VC" ')
+    parser.add_argument('-t', '--title', action='store', default=u'VC.01', 
+                        help='title name, default is "VC.01" ')
     parser.add_argument('-v', '--view', action='store_true',
                         help='view only, no download')
     args = parser.parse_args()
