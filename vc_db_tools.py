@@ -3,20 +3,17 @@
 '''
 用于对vc数据库进行查询的一组工具
 '''
+
 import sqlite3
 import argparse
-import time
 
+# 数据库文件
 db_file = 'vc_data.db'
-
 
 class queryDB(object):
     '''查询DB工具类'''
-
     def __init__(self, db_file):
         self.conn = sqlite3.connect(db_file)
-        self.one_week_ago = time.strftime('%Y-%m-%d',
-                                          time.localtime(time.time() - 24 * 3600 * 7))
         self.columns = ('avnum, uploadtime, updatetime, palacetime, downstatus,'
                         ' playnum, dmnum, v_coin, v_reply, v_favorite, v_share, title')
 
@@ -24,6 +21,7 @@ class queryDB(object):
         self.conn.close()
 
     def _output(self, lines, title=None):
+        '''将数据格式化输出'''
         if title is None:
             print(self.columns)
         else:
@@ -38,26 +36,31 @@ class queryDB(object):
             print('')
 
     def _query(self, sql, title=None):
+        '''执行SQL语句，将结果返回'''
         curs = self.conn.execute(sql)
         rows = curs.fetchall()
         self._output(rows, title)
         return rows
 
     def all(self):
+        '''输出所有记录'''
         sql = ('select %s from bbvc;' % self.columns)
         return self._query(sql)
 
     def avid(self, avnum='%'):
+        '''按 编号/id 进行模糊查找'''
         sql = ('select %s from bbvc where avnum like "%s";'
                % (self.columns, avnum))
         return self._query(sql)
 
     def name(self, title='%'):
+        '''按标题进行模糊查找'''
         sql = ('select %s from bbvc where title like "%s";'
                % (self.columns, title))
         return self._query(sql)
 
     def upload(self, day=None):
+        '''按上传时间进行模糊查找'''
         if day is None:
             sql = ('select uploadtime, count(*) from bbvc group by uploadtime'
                    ' order by uploadtime desc;')
@@ -68,6 +71,7 @@ class queryDB(object):
             return self._query(sql)
 
     def palace(self, day=None):
+        '''按殿堂时间进行模糊查找'''
         if day is None:
             sql = ('select palacetime, count(*) from bbvc group by palacetime'
                    ' order by palacetime desc;')
@@ -78,6 +82,7 @@ class queryDB(object):
             return self._query(sql)
 
     def download(self, day=None):
+        '''按下载时间进行查询'''
         if day is None:
             sql = ('select downtime, count(*) from bbvc group by downtime'
                    ' order by downtime desc;')
@@ -88,6 +93,7 @@ class queryDB(object):
             return self._query(sql)
 
     def update(self, day=None):
+        '''按更新时间进行查询'''
         if day is None:
             sql = ('select updatetime, count(*) from bbvc group by updatetime'
                    ' order by updatetime desc;')
@@ -136,6 +142,7 @@ class queryDB(object):
         return True
 
     def watch(self, limit=None):
+        '''按观看次数排序'''
         if limit is None:
             sql = 'select * from bbvc order by playnum desc;'
         else:
@@ -144,6 +151,7 @@ class queryDB(object):
         return self._query(sql)
 
     def dm(self, limit=None):
+        '''按弹幕数量排序'''
         if limit is None:
             sql = 'select * from bbvc order by dmnum desc;'
         else:
