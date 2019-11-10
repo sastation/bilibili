@@ -26,14 +26,11 @@ def _getMetaViaHtml(html,aids,titles,dates):
     soup = bs4.BeautifulSoup(html, "html.parser")
 
     # 获得搜索页面结果内容，若没有返回 False
-    result = soup.findAll('div', class_='result-wrap clearfix')
+    result = soup.findAll('li', class_='video-item matrix')
     if len(result)<1:
         return(False)
     
-    result = result[0]
-    songs = result.findAll('li', class_='video')
-    
-    size = len(songs)
+    size = len(result)
     print(size)
 
     if Debug:
@@ -41,11 +38,9 @@ def _getMetaViaHtml(html,aids,titles,dates):
             print(html)
             sys.exit(-1)
 
-    for eachSong in songs:
-        aid = eachSong.find('a', href=True)
-        aid = re.match('.*av(\d+)', aid['href'])
-        aid = aid.group(1)
 
+    for eachSong in result:
+        aid = eachSong.find('span', class_='type avid').text[2:]
         title = eachSong.find('a', class_='title').text
 
         date = eachSong.find('span', class_='so-icon time').text
@@ -87,7 +82,7 @@ def _get_data(url):
         else:
             print("Loop +1")
             time.sleep(1)
-        
+
     # 相关统计数据
     watchs      = []    # 播放数
     dms         = []    # 弹幕数
@@ -182,13 +177,13 @@ def update_data(db_file='vc_test.db', start_page=1, end_page=50):
     
     for i in range(start_page, end_page + 1):
         print("Page:%s" % i, end=', ')  
-        # print(url+str(i)) # debug
+        print(url+str(i)) # debug
         s_time = time.time()
         _get_data(url + str(i))
         print("Time: %s" % (time.time()-s_time))
         time.sleep(5) # 暂停5秒以避免被封
 
-    _update_db(db_file)
+    #_update_db(db_file)
 
     if Debug and Detail:
         for line in records:
