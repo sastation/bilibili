@@ -183,7 +183,7 @@ def update_data(db_file='vc_test.db', start_page=1, end_page=50):
         print("Time: %s" % (time.time()-s_time))
         time.sleep(5) # 暂停5秒以避免被封
 
-    #_update_db(db_file)
+    _update_db(db_file)
 
     if Debug and Detail:
         for line in records:
