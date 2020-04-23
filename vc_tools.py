@@ -8,13 +8,13 @@ import sqlite3
 import argparse
 
 # 数据库文件
-db_file = 'vc_data.db'
+db_file = 'vc.db'
 
 class queryDB(object):
     '''查询DB工具类'''
     def __init__(self, db_file):
         self.conn = sqlite3.connect(db_file)
-        self.columns = ('avnum, uploadtime, updatetime, palacetime, downstatus,'
+        self.columns = ('bvid, uploadtime, updatetime, palacetime, downstatus,'
                         ' playnum, dmnum, v_coin, v_reply, v_favorite, v_share, title')
 
     def __del__(self):

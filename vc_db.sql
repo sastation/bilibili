@@ -3,7 +3,8 @@
 ALTER TABLE bbvc RENAME TO bbvc01;
 
 CREATE TABLE IF NOT EXISTS bbvc (
-    avnum vchar(25) primary key, 
+    bvid vchar(25) primary key, 
+    avnum vchar(25), 
     uploadtime vchar(10),
     playnum integer, 
     dmnum integer, 
@@ -19,6 +20,6 @@ CREATE TABLE IF NOT EXISTS bbvc (
 );
 
 INSERT INTO bbvc (
-    avnum, uploadtime, playnum, dmnum, palacetime, updatetime, downtime, downstatus, title)
-SELECT avnum, uploadtime, playnum, dmnum, palacetime, updatetime, downtime, downstatus, title
+    bvid, avnum, uploadtime, playnum, dmnum, palacetime, updatetime, downtime, downstatus, title)
+SELECT bvid, avnum, uploadtime, playnum, dmnum, palacetime, updatetime, downtime, downstatus, title
 FROM bbvc01;

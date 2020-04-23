@@ -7,9 +7,9 @@
 '''
 import argparse
 
-from libs import vc_db_update as dbupdate
-from libs import vc_db_download as dbdownload
-db_file = 'vc_data.db'
+from libs import vc_update as dbupdate
+from libs import vc_download as dbdownload
+db_file = 'vc.db'
 
 
 # Main function

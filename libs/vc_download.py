@@ -6,7 +6,7 @@ import time
 import sqlite3
 
 
-def download(dbfile='vc_test.db'):
+def download(dbfile='vc.db'):
     '''下载视频'''
     conn = sqlite3.connect(dbfile)
 
@@ -21,8 +21,8 @@ def download(dbfile='vc_test.db'):
 
     # 下载视频
     download_time = time.strftime('%Y-%m-%d', time.localtime())
-    for av in avs:
-        url = "http://www.bilibili.com/video/" + av
+    for bvid in bvids: 
+        url = "http://www.bilibili.com/video/" + bvid
         print('you-get -o video "%s" > /dev/null 2>&1' % url)
 
         #!cmd = subprocess.call('you-get -o video "%s" > /dev/null 2>&1' % url,
@@ -34,8 +34,8 @@ def download(dbfile='vc_test.db'):
         else:
             status = 'good'
         conn.execute('update bbvc set downtime=?, downstatus=?'
-                     ' where avnum=?;',
-                     (download_time, status, av))
+                     ' where bvid=?;',
+                     (download_time, status, bvid))
 
     conn.commit()
     conn.close()
