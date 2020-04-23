@@ -156,6 +156,7 @@ def update_data(db_file='vc.db', start_page=1, end_page=50):
 # Main
 if __name__ == '__main__':
     '''main function'''
-    update_data(end_page=2)
+    update_data(db_file="vc.db", start_page=1, end_page=50)
+    #update_data(end_page=2) # debug
 
 # End

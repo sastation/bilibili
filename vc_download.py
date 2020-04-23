@@ -11,13 +11,13 @@ def download(dbfile='vc.db'):
     conn = sqlite3.connect(dbfile)
 
     # 得到数据库中未下载的殿堂avnum列表
-    avs = []
-    curs = conn.execute('select * from bbvc'
+    bvids = []
+    curs = conn.execute('select bvid, avnum from bbvc'
                         ' where (downstatus!="good" or downstatus isnull)'
                         ' and palacetime notnull;')
     lines = curs.fetchall()
     for item in lines:
-        avs.append(item[0])
+        bvids.append(item[0])
 
     # 下载视频
     download_time = time.strftime('%Y-%m-%d', time.localtime())
