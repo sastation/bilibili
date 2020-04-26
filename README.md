@@ -9,16 +9,16 @@ pip3 install --upgrade you-get
 
 ## 获得收藏夹中的内容
 - bb_favorite.py
-    -m, --mid, 用户空间编号，默认为 25527367/推车老牛
-    -t, --title, 收藏夹名称，默认为 VC.01
-    -v, --view, 查看 (若无此项则为下载)
+    -l, --list, 列出收藏夹名称与对应的mid
+    -f, --folder, 收藏夹名称
+    -d, --download, 下载选项，若无则为查看
 
 ```bash
 # 查看
-./bb_favorite.py -v -t VC.02
+./bb_favorite.py -f VC.02
 
 ## 下载
-./bb_favorite.py -t VC.02
+./bb_favorite.py -f VC.02 -d
 ```
 
 ## 将视频转为MP3
@@ -33,3 +33,9 @@ pip3 install --upgrade you-get
 # -p: 视频目录
 # -e: danmaku2ass 程序目录
 ```
+
+## 获取排名前1000的Vocaloid中文曲数据并存入数据库vc.db
+./vc_update.py
+
+## 下载 vc.db 中播放数超过10万的视频，下载后标记为已完成
+./vc_download.py
