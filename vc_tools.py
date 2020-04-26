@@ -47,10 +47,10 @@ class queryDB(object):
         sql = ('select %s from bbvc;' % self.columns)
         return self._query(sql)
 
-    def avid(self, avnum='%'):
-        '''按 编号/id 进行模糊查找'''
-        sql = ('select %s from bbvc where avnum like "%s";'
-               % (self.columns, avnum))
+    def bvid(self, num='%'):
+        '''按 编号/bvid 进行模糊查找'''
+        sql = ('select %s from bbvc where bvid like "%s";'
+               % (self.columns, num))
         return self._query(sql)
 
     def name(self, title='%'):
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     else:
         print(parser.print_help())
 
-    # db.avid('av44%')
+    # db.bvid('BV1f7411%')
     # db.upload('2017%')
     # db.palace()
     # db.download()
