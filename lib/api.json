@@ -1,0 +1,128 @@
+{
+    "video": {
+        "info": {
+            "info_simple": {
+                "url": "https://api.bilibili.com/x/web-interface/archive/stat",
+                "method": "GET",
+                "verify": false,
+                "params": {
+                    "bvid": "bv号"
+                },
+                "comment": "视频简易信息"
+            },
+            "info_detail": {
+                "url": "https://api.bilibili.com/x/web-interface/view",
+                "method": "GET",
+                "verify": false,
+                "params": {
+                    "bvid": "bv号"
+                },
+                "comment": "视频详细信息"
+            },
+            "tags": {
+                "url": "https://api.bilibili.com/x/tag/archive/tags",
+                "method": "GET",
+                "verify": true,
+                "params": {
+                    "bvid": "bv号"
+                },
+                "comment": "视频标签信息"
+            },
+            "pages": {
+                "url": "https://api.bilibili.com/x/player/pagelist",
+                "method": "GET",
+                "verify": false,
+                "params": {
+                    "bvid": "bv号"
+                },
+                "comment": "分P列表"
+            },
+            "playurl": {
+                "url": "https://api.bilibili.com/x/player/playurl",
+                "method": "GET",
+                "verify": false,
+                "params": {
+                    "avid": "av号",
+                    "cid": "分P编号",
+                    "qn": 112
+                },
+                "comment": "视频下载的信息，下载链接需要提供headers伪装浏览器请求（Referer和User-Agent）"
+            }
+        }
+    },
+    "user": {
+        "info": {
+            "my_info": {
+                "url": "https://api.bilibili.com/x/space/myinfo",
+                "method": "GET",
+                "verify": true,
+                "comment": "获取自己的信息"
+            },
+            "info": {
+                "url": "https://api.bilibili.com/x/space/acc/info",
+                "method": "GET",
+                "verify": false,
+                "params": {
+                    "mid": "uid"
+                },
+                "comment": "用户基本信息"
+            },
+            "stat": {
+                "url": "https://api.bilibili.com/x/relation/stat",
+                "method": "GET",
+                "verify": false,
+                "params": {
+                    "vmid": "uid"
+                },
+                "comment": "关注数，粉丝数"
+            },
+            "media_list": {
+                "url": "https://api.bilibili.com/medialist/gateway/base/created",
+                "method": "GET",
+                "verify": true,
+                "params": {
+                    "up_mid": "用户uid",
+                    "ps": 100,
+                    "pn": "页码",
+                    "is_space": 0
+                },
+                "comment": "获取收藏夹列表信息"
+            },
+            "media_list_content": {
+                "url": "https://api.bilibili.com/medialist/gateway/base/spaceDetail",
+                "method": "GET",
+                "verify": true,
+                "params": {
+                    "media_id": "收藏夹id",
+                    "ps": 20,
+                    "pn": "页码",
+                    "keyword": "搜索关键词",
+                    "order": "排序依据。mtime最近收藏，view最多播放，pubtime最新投稿",
+                    "type": 0,
+                    "tid": "分区ID，0为全部"
+                },
+                "comment": "获取收藏夹内容"
+            }
+        }
+    },
+    "other": {
+        "online": {
+            "url": "https://api.bilibili.com/x/web-interface/online",
+            "method": "GET",
+            "verify": false,
+            "comment": "获取在线人数"
+        },
+        "search": {
+            "url": "https://api.bilibili.com/x/web-interface/search/type",
+            "method": "GET",
+            "verify": false,
+            "params": {
+                "page": 1,
+                "order": "click",
+                "search_type": "video",
+                "keyword": "VOCALOID中文曲"
+            },
+            "comment": "搜索指定内容"
+        }
+    }
+}

@@ -5,6 +5,22 @@
 import os
 import requests
 
+```
+# 新的方法
+1. 获得指定日期的弹幕
+- 使用新的URL：https://api.bilibili.com/x/v2/dm/history?type=1&oid=183088999&date=2020-04-25
+    - oid = 详情API中的[data][cid]
+    - date = YYYY-mm-dd
+    - type always equal 1
+
+2. 获取所有有弹幕的日期
+- ???? 
+
+3. 获取历史弹幕需要登录
+
+4. 
+
+```
 
 def history_dm(avid, folder):
     # 历史弹幕列表
