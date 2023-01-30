@@ -42,6 +42,7 @@ def get_favorite(mid, page):
         favlist[-1]['owner'] = item['upper']['name']
         favlist[-1]['playnum'] = item['cnt_info']['play']
         favlist[-1]['dmnum'] = item['cnt_info']['danmaku']
+        favlist[-1]['page'] = item['page']
 
     return favlist
 
@@ -59,13 +60,17 @@ def get_all_favlist(mid):
     return favlist
 
 
-def download(bvid, folder):
+def download(bvid, folder, page=1):
     '''下载指定avnum视频'''
     import subprocess
     url = 'https://www.bilibili.com/video/%s' % bvid
     
     # print('you-get -o %s "%s"' % (folder, url))
-    subprocess.call('you-get -o %s "%s"' % (folder, url), shell=True)
+    if page > 1:
+        subprocess.call('you-get --playlist -o %s "%s"' % (folder, url), shell=True)
+    else:
+        subprocess.call('you-get -o %s "%s"' % (folder, url), shell=True)
+
     return 0
 
 
@@ -75,8 +80,10 @@ Folders = {
         'VC.02': '44835167',
         '歌舞': '54285067',
         '动画CG': '469182867',
+        '临时': '498471367',
+        'Ai': '1604743267',
         '极乐净土': '92676967',
-        '临时': '498471367'
+        '经典歌曲': '1999390867'
     }
 
 if __name__ == '__main__':
@@ -112,7 +119,7 @@ if __name__ == '__main__':
                 print("%s is exist!" % file)
                 time.sleep(1)
             else:
-                download(item['bvid'], folder)
+                download(item['bvid'], folder, item['page'])
     else:
         print('### View Only ###')
         for item in bvlist:
