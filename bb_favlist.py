@@ -67,9 +67,9 @@ def download(bvid, folder, page=1):
     
     # print('you-get -o %s "%s"' % (folder, url))
     if page > 1:
-        subprocess.call('you-get --playlist -o %s "%s"' % (folder, url), shell=True)
+        subprocess.call('you-get --format=dash-flv480 --playlist -o %s "%s"' % (folder, url), shell=True)
     else:
-        subprocess.call('you-get -o %s "%s"' % (folder, url), shell=True)
+        subprocess.call('you-get --format=dash-flv480 -o %s "%s"' % (folder, url), shell=True)
 
     return 0
 
@@ -112,8 +112,10 @@ if __name__ == '__main__':
         print('### Download... ###')
         folder = "./video/favorite/%s" % args.folder # 下载目录
         for item in bvlist:
-            print(item)
+            #print(item)
             bvname = item['name']
+            bvname = bvname.replace("/", "-") 
+
             file = folder + "/" + bvname + "*"
             if len(glob.glob(file)) > 1: # 判断是否已下载
                 print("%s is exist!" % file)
