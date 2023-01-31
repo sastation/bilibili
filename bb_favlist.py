@@ -66,10 +66,15 @@ def download(bvid, folder, page=1):
     url = 'https://www.bilibili.com/video/%s' % bvid
     
     # print('you-get -o %s "%s"' % (folder, url))
-    if page > 1:
-        subprocess.call('you-get --format=dash-flv480 --playlist -o %s "%s"' % (folder, url), shell=True)
-    else:
-        subprocess.call('you-get --format=dash-flv480 -o %s "%s"' % (folder, url), shell=True)
+    cmd = 'you-get -o %s "%s"' %(folder, url)
+    if page > 1: # multi-pv
+        cmd = "$cmd --playlist"
+
+    code = subprocess.call("%s --format=dash-flv480" % cmd, shell=True)
+    if code != 0:
+        code = subprocess.call(cmd, shell=True)
+        if code != 0:
+            print("Code: %s, bvid: %s" % (code, bvid))
 
     return 0
 
