@@ -1,0 +1,63 @@
+name="『华语金曲』一人一首成名曲"; mkdir $name && mv $name*mp4 $name
+name="【曾经家喻户晓的经典老歌】"; mkdir $name && mv $name*mp4 $name
+name="【华语金曲合集】60首百听不厌经典怀旧歌曲精选"; mkdir $name && mv $name*mp4 $name
+name="【时长6小时】最好听的100首经典华语歌曲"; mkdir $name && mv $name*mp4 $name
+name="【时长7小时】100首精选流行音乐合集"; mkdir $name && mv $name*mp4 $name
+name="【最好听80后回忆歌曲100首】"; mkdir $name && mv $name*mp4 $name
+name="经典老歌系列大合集（港台篇）"; mkdir $name && mv $name*mp4 $name
+
+# 处理文件名，提取()中的内容做为文件名
+for in_file in *.mp4
+do
+  out_file=`echo -n $in_file | awk -F'[()]' '{print $2}' | awk -F'. ' '{print $2}'`
+  if [ "x"$out_file != "x" ]; then
+  	echo "$in_file ===> $out_file"
+	mv "$in_file" "$out_file.mp4"
+  fi
+done
+
+# 提取音频文件，以直接复制方式提取
+for in_file in *.mp4
+do
+  # 获取文件名
+  #awk -F'.' '{print $1}'`
+  out_file=`echo -n $in_file | awk -F'.' '{for(i=1;i<NF;i++) {printf "%s",$i}; printf "\n" }'`
+  echo "$in_file ===> $out_file"
+  
+  # 以直接复制方式提取mp4中的音频
+  ffmpeg -i "$in_file" -vn -c:a copy "$out_file.aac"
+done
+
+# 将音频文件转成MP3，并进行音量平滑
+for in_file in *.aac
+do
+  # 获取文件名
+  #out_file=`echo -n $in_file | awk -F'.' '{print $1}'`
+  out_file=`echo -n $in_file | awk -F'.' '{for(i=1;i<NF;i++) {printf "%s",$i}; printf "\n" }'`
+  echo "$in_file ===> $out_file"
+  
+  # 将音频转换成mp3
+  ffmpeg -i "$in_file" -vn -f mp3 -af "loudnorm=i=-14" "$out_file.mp3"
+  #ffmpeg -i "$in_file" -vn -f mp3 "$out_file.mp3"
+done
+
+
+# 音量查看与平滑 
+for name in *.aac
+do
+  echo -n $name": "
+  # 查看音量
+  ffmpeg -i $name  -af "volumedetect" -f null /dev/null 2>&1 | grep -E "(mean_volume|max_volume)"
+  
+  # 平滑音量
+  #ffmpeg -i $name -af "loudnorm=i=-14" mp3.$name
+done
+
+exit
+
+# 提取()里的内容
+ls *mp4 | awk -F "[()]" '{print $2}'
+
+# 转成 mp3
+ffmpeg -i test.mp4 -f mp3 -ar 16000 test.mp3
+
