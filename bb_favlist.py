@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
     if args.download:
         print('### Download... ###')
-        folder = "./video/favorite/%s" % args.folder # 下载目录
+        folder = "./video/%s" % args.folder # 下载目录
         for item in bvlist:
             #print(item)
             bvname = item['name']
