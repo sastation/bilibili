@@ -123,13 +123,16 @@ if __name__ == '__main__':
             #print(item)
             bvname = item['name']
             bvname = bvname.replace("/", "-") 
+            bvname = bvname.replace('[','[[]').replace(']','[]]') # transfer [] for glob.glob
 
             file = folder + "/" + bvname + "*"
             if len(glob.glob(file)) > 1: # 判断是否已下载
                 print("%s is exist!" % file)
                 time.sleep(1)
             else:
-                download(item['bvid'], folder, item['page'])
+                print(item['bvid'], item['name'])
+                if not '已失效视频' in item['name']:
+                    download(item['bvid'], folder, item['page'])
     else:
         print('### View Only ###')
         for item in bvlist:
