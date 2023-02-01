@@ -68,13 +68,16 @@ def download(bvid, folder, page=1):
     # print('you-get -o %s "%s"' % (folder, url))
     cmd = 'you-get -o %s "%s"' %(folder, url)
     if page > 1: # multi-pv
-        cmd = "$cmd --playlist"
+        cmd = "%s --playlist" % cmd
 
-    code = subprocess.call("%s --format=dash-flv480" % cmd, shell=True)
+    # 先偿试下载720p若失败以480p下载再失败以默认码率偿试下载，若3次都失败输出错误bvid
+    code = subprocess.call("%s -c cookie.txt --format=dash-flv720" % cmd, shell=True)
+    if code != 0:
+        code = subprocess.call("%s --format=dash-flv480" % cmd, shell=True)
     if code != 0:
         code = subprocess.call(cmd, shell=True)
-        if code != 0:
-            print("Code: %s, bvid: %s" % (code, bvid))
+    if code != 0:
+        print("Code: %s, bvid: %s" % (code, bvid))
 
     return 0
 
