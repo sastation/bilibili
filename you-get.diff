@@ -1,0 +1,33 @@
+# fixed illegal char in file name
+# ~/zpy3/lib/python3.8/site-packages/you_get/
+# common.py
+955c955,956
+<         return result
+---
+>         #return result
+>         return replace_illegal_char(result)
+976c977,978
+<     return result.replace("'", "_")
+---
+>     #return result.replace("'", "_")
+>     return replace_illegal_char(result)
+1870a1873,1883
+> 
+> 
+> def replace_illegal_char(text):
+>     text = text.replace('"', "-")
+>     text = text.replace("'", "-")
+>     text = text.replace("/", "-")
+>     text = text.replace("|", "-")
+>     text = text.replace(":", "-")
+>     text = text.replace("?", "-")
+>     text = text.replace("*", "-")
+>     return text
+
+# extractor.py
+3c3
+< from .common import match1, maybe_print, download_urls, get_filename, parse_host, set_proxy, unset_proxy, get_content, dry_run, player
+---
+> from .common import match1, maybe_print, download_urls, get_filename, parse_host, set_proxy, unset_proxy, get_content, dry_run, player, replace_illegal_char
+179a180
+>         self.title = replace_illegal_char(self.title)
