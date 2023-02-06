@@ -122,15 +122,20 @@ if __name__ == '__main__':
         for item in bvlist:
             #print(item)
             bvname = item['name']
+            bvname = bvname.replace('"', "-") 
+            bvname = bvname.replace("'", "-") 
             bvname = bvname.replace("/", "-") 
-            bvname = bvname.replace('[','[[]').replace(']','[]]') # transfer [] for glob.glob
+            bvname = bvname.replace("|", "-") 
+            bvname = bvname.replace(":", "-") 
+            bvname = bvname.replace("?", "-") 
+            bvname = bvname.replace("*", "-") 
+            fname = glob.escape(folder + "/" + bvname) # tranferred [] for glob.glob
 
-            file = folder + "/" + bvname + "*"
-            if len(glob.glob(file)) > 1: # 判断是否已下载
-                print("%s is exist!" % file)
-                time.sleep(1)
+            if len(glob.glob(fname+"*")) > 1: # 判断是否已下载
+                print("%s is exist!" % fname)
+                time.sleep(0.3)
             else:
-                print(item['bvid'], item['name'])
+                print("Warning: ", item['bvid'], item['name'], fname)
                 if not '已失效视频' in item['name']:
                     download(item['bvid'], folder, item['page'])
     else:
