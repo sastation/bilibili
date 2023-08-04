@@ -1,3 +1,10 @@
+1. 使用firefox插件cookies.txt得到bilibili的cookie文件 - cookie.txt
+2. 下载指定收藏夹视频文件：./bb_favlist.py -f Ai -d
+3. 提取音频文件，平滑音频音量：cd video/Ai; ../video2mp3.sh
+4. 将mp3文件移至音频目录：mv *.mp3 ../../audio/Ai
+
+exit 0
+
 name="『华语金曲』一人一首成名曲"; mkdir $name && mv $name*mp4 $name
 name="【曾经家喻户晓的经典老歌】"; mkdir $name && mv $name*mp4 $name
 name="【华语金曲合集】60首百听不厌经典怀旧歌曲精选"; mkdir $name && mv $name*mp4 $name
