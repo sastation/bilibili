@@ -7,7 +7,7 @@ f_process() {
     out_file=`echo $in_file | sed "s/&/-/g" | sed "s/\.mp4//g"`
     echo "$in_file ===> $out_file"
 
-    # 将音频转换成mp3
+    # 将音频转换成mp3并平滑音量
     ffmpeg -i "$in_file" -vn -f mp3 -af "loudnorm=i=-14" "$out_file.mp3"
 }
 
