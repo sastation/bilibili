@@ -1,5 +1,5 @@
 1. 使用firefox插件cookies.txt得到bilibili的cookie文件 - cookie.txt
-2. 下载指定收藏夹视频文件：./bb_favlist.py -f Ai -d
+2. 下载指定收藏夹视频文件：./bb_favlist.py -f Ai -d, # 若下载慢，修改/etc/resolv.conf中DNS设置使用公共DNS
 3. 提取音频文件，平滑音频音量：cd video/Ai; ../video2mp3.sh
 4. 将mp3文件移至音频目录：mv *.mp3 ../../audio/Ai
 
