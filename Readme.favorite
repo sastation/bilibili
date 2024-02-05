@@ -3,6 +3,9 @@
 3. 提取音频文件，平滑音频音量：cd video/Ai; ../video2mp3.sh
 4. 将mp3文件移至音频目录：mv *.mp3 ../../audio/Ai
 
+5. 单独下载视频文件（含所有子项目）：bb_single.sh
+    # you-get -o ./video/经典歌曲 -c cookie.txt --format=dash-flv720 --playlist https://www.bilibili.com/video/BV1us411X76M/
+6. 截取歌名前70个字符并汇总：find . -name "*.xml" -exec echo {} \; | cut -b 3-70 | sort | uniq -c
 exit 0
 
 name="『华语金曲』一人一首成名曲"; mkdir $name && mv $name*mp4 $name
