@@ -71,9 +71,11 @@ def download(bvid, folder, page=1):
         cmd = "%s --playlist" % cmd
 
     # 先偿试下载720p若失败以480p下载再失败以默认码率偿试下载，若3次都失败输出错误bvid
-    code = subprocess.call("%s -c cookie.txt --format=dash-flv720" % cmd, shell=True)
+    #code = subprocess.call("%s -c cookie.txt --format=dash-flv720" % cmd, shell=True)
+    # 视频格式有变化，dash-flv{720,480,360}-{AV1,AVC,HEVC}, 默认使用, 这里默认使用720-AVC
+    code = subprocess.call("%s -c cookie.txt --format=dash-flv720-AVC" % cmd, shell=True)
     if code != 0:
-        code = subprocess.call("%s --format=dash-flv480" % cmd, shell=True)
+        code = subprocess.call("%s --format=dash-flv480-AVC" % cmd, shell=True)
     if code != 0:
         code = subprocess.call(cmd, shell=True)
     if code != 0:
